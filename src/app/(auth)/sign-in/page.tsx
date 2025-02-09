@@ -1,10 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { auth, signIn } from "@/lib/auth";
+import executeAction from "@/lib/execute-action";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { redirect } from "next/navigation";
 
-export default function SignIn() {
+export default async function SignIn() {
+  const session = await auth();
+  if (session) {
+    redirect("/");
+  }
   return (
     <div className="h-full flex flex-col items-center justify-center bg-slate-50">
       <div className="w-full max-w-sm mx-auto space-y-6 p-5 shadow-xl rounded-md bg-white">
@@ -13,6 +19,7 @@ export default function SignIn() {
         <form
           action={async () => {
             "use server";
+            await signIn("google");
           }}
         >
           <Button className="w-full" variant="outline">
@@ -40,8 +47,13 @@ export default function SignIn() {
         {/* Email/Password Sign In */}
         <form
           className="space-y-4"
-          action={async () => {
+          action={async (formData: FormData) => {
             "use server";
+            await executeAction({
+              actionFn: async () => {
+                await signIn("credentials", formData);
+              },
+            });
           }}
         >
           <Input
