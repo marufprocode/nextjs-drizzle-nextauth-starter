@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import db from "@/db";
-import { usersTable } from "@/db/schemas";
+import { users } from "@/db/schemas";
 import { credentialsSchema } from "@/lib/auth";
 import executeAction from "@/lib/execute-action";
 import Link from "next/link";
@@ -31,10 +31,14 @@ export default function SignUpPage() {
             "use server";
             const res = await executeAction({
               actionFn: async () => {
-                const validatedSchema = credentialsSchema.parse(formData);
-                await db.insert(usersTable).values({
+                const email = formData.get("email");
+                const password = formData.get("password");
+                const validatedSchema = credentialsSchema.parse({
+                  email,
+                  password,
+                });
+                await db.insert(users).values({
                   name: "sads",
-                  age: 32,
                   email: validatedSchema.email,
                   password: validatedSchema.password,
                 });
@@ -42,6 +46,8 @@ export default function SignUpPage() {
             });
             if (res.success) {
               redirect("/sign-in");
+            } else {
+              console.log(res.error);
             }
           }}
         >
