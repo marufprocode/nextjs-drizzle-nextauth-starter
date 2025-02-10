@@ -6,7 +6,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { z } from "zod";
 
-const credentialsSchema = z.object({
+export const credentialsSchema = z.object({
   email: z.string().email().min(1, "Email is required"),
   password: z.string().min(1, "Password is required"),
 });
