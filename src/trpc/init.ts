@@ -41,10 +41,10 @@ const isAuthenticated = t.middleware(({ ctx, next }) => {
   if (!ctx.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-  return next({ ctx });
+  return next({ ctx: { ...ctx, userId: ctx.userId } });
 });
 
 export const baseProcedure = t.procedure.use(isRateLimited);
 export const protectedProcedure = t.procedure
-  .use(isAuthenticated)
-  .use(isRateLimited);
+  .use(isRateLimited)
+  .use(isAuthenticated);

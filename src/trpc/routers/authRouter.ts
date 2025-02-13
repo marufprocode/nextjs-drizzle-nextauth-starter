@@ -1,10 +1,11 @@
 import db from "@/db";
 import { users } from "@/db/schemas";
+import { signOut as signOutSession } from "@/lib/auth";
 import { TRPCError } from "@trpc/server";
 import bcryptjs from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { baseProcedure, createTRPCRouter } from "../init";
+import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const authRouter = createTRPCRouter({
   signUp: baseProcedure
@@ -34,4 +35,13 @@ export const authRouter = createTRPCRouter({
       });
       return user;
     }),
+  getUser: protectedProcedure.query(async ({ ctx }) => {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, ctx.userId),
+    });
+    return user;
+  }),
+  signOut: protectedProcedure.mutation(async () => {
+    await signOutSession();
+  }),
 });
