@@ -26,9 +26,11 @@ export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
 
-export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
+const isAuthenticated = t.middleware(({ ctx, next }) => {
   if (!ctx.userId) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({ ctx });
 });
+
+export const protectedProcedure = t.procedure.use(isAuthenticated);
