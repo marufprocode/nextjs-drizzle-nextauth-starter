@@ -1,7 +1,7 @@
 import db from "@/db";
 import { users } from "@/db/schemas";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import { eq } from "drizzle-orm";
 import NextAuth from "next-auth";
 import { encode as defaultEncode } from "next-auth/jwt";
@@ -38,7 +38,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return Promise.reject(new Error("User not found"));
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+        const isPasswordValid = await bcryptjs.compare(password, user.password);
 
         if (email === user.email && isPasswordValid) {
           return Promise.resolve({

@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { rateLimit } from "@/lib/redis";
 import { initTRPC, TRPCError } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
@@ -24,7 +25,17 @@ const t = initTRPC.context<Context>().create({
 // Base router and procedure helpers
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
-export const baseProcedure = t.procedure;
+
+const isRateLimited = t.middleware(async ({ ctx, next }) => {
+  const { success } = await rateLimit.limit(ctx.userId ?? "anonymous");
+  if (!success) {
+    throw new TRPCError({
+      code: "TOO_MANY_REQUESTS",
+      message: "Rate limit exceeded",
+    });
+  }
+  return next({ ctx });
+});
 
 const isAuthenticated = t.middleware(({ ctx, next }) => {
   if (!ctx.userId) {
@@ -33,4 +44,7 @@ const isAuthenticated = t.middleware(({ ctx, next }) => {
   return next({ ctx });
 });
 
-export const protectedProcedure = t.procedure.use(isAuthenticated);
+export const baseProcedure = t.procedure.use(isRateLimited);
+export const protectedProcedure = t.procedure
+  .use(isAuthenticated)
+  .use(isRateLimited);

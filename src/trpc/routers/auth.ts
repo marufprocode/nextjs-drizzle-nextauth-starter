@@ -1,7 +1,7 @@
 import db from "@/db";
 import { users } from "@/db/schemas";
 import { TRPCError } from "@trpc/server";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { baseProcedure, createTRPCRouter } from "../init";
@@ -26,7 +26,7 @@ export const authRouter = createTRPCRouter({
           message: "User already exists",
         });
       }
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcryptjs.hash(password, 10);
       const user = await db.insert(users).values({
         email,
         password: hashedPassword,
