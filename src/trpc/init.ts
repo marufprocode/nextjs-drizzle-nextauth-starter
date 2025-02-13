@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import { cache } from "react";
 import superjson from "superjson";
 
@@ -7,8 +7,6 @@ export const createTRPCContext = cache(async () => {
   const user = await auth();
   return {
     userId: user?.user?.id,
-    email: user?.user?.email,
-    name: user?.user?.name,
   };
 });
 
@@ -27,3 +25,10 @@ const t = initTRPC.context<Context>().create({
 export const createTRPCRouter = t.router;
 export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
+
+export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
+  if (!ctx.userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({ ctx });
+});
