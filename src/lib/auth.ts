@@ -1,13 +1,13 @@
 import db from "@/db";
-import { accounts, users } from "@/db/schemas";
+import { users } from "@/db/schemas";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
 import NextAuth from "next-auth";
+import { encode as defaultEncode } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { z } from "zod";
 import { v4 as uuid } from "uuid";
-import { encode as defaultEncode } from "next-auth/jwt";
+import { z } from "zod";
 
 export const credentialsSchema = z.object({
   email: z.string().email().min(1, "Email is required"),
@@ -32,7 +32,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           .select()
           .from(users)
           .where(eq(users.email, email));
-          
+
         if (!user) {
           return Promise.reject(new Error("User not found"));
         }

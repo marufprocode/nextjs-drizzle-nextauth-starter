@@ -8,9 +8,10 @@ export const appRouter = createTRPCRouter({
         text: z.string(),
       })
     )
-    .query((opts) => {
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.userId;
       return {
-        greeting: `hello ${opts.input.text}`,
+        greeting: `hello ${input.text}, userId: ${userId}`,
       };
     }),
 });
