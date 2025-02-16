@@ -1,13 +1,13 @@
 import {
+  boolean,
   integer,
   pgTable,
+  primaryKey,
+  text,
   timestamp,
   uniqueIndex,
   uuid,
   varchar,
-  text,
-  primaryKey,
-  boolean,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccountType } from "next-auth/adapters";
 
@@ -17,7 +17,7 @@ export const users = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     name: varchar({ length: 255 }).notNull(),
     email: varchar({ length: 255 }).notNull().unique(),
-    password: varchar({ length: 15 }),
+    password: varchar({ length: 255 }),
     sessionId: uuid("session_id"),
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     image: text("image"),

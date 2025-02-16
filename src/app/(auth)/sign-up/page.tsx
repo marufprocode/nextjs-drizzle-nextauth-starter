@@ -1,11 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import db from "@/db";
-import { users } from "@/db/schemas";
-import { credentialsSchema } from "@/lib/auth";
-import executeAction from "@/lib/execute-action";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import SignUpForm from "./_components/SignUpForm";
 
 export default function SignUpPage() {
   return (
@@ -24,51 +19,7 @@ export default function SignUpPage() {
           </div>
         </div>
 
-        {/* Email/Password Sign Up */}
-        <form
-          className="space-y-4"
-          action={async (formData: FormData) => {
-            "use server";
-            const res = await executeAction({
-              actionFn: async () => {
-                const email = formData.get("email");
-                const password = formData.get("password");
-                const validatedSchema = credentialsSchema.parse({
-                  email,
-                  password,
-                });
-                await db.insert(users).values({
-                  name: "sads",
-                  email: validatedSchema.email,
-                  password: validatedSchema.password,
-                });
-              },
-            });
-            if (res.success) {
-              redirect("/sign-in");
-            } else {
-              console.log(res.error);
-            }
-          }}
-        >
-          <Input
-            name="email"
-            placeholder="Email"
-            type="email"
-            required
-            autoComplete="email"
-          />
-          <Input
-            name="password"
-            placeholder="Password"
-            type="password"
-            required
-            autoComplete="new-password"
-          />
-          <Button className="w-full" type="submit">
-            Sign Up
-          </Button>
-        </form>
+        <SignUpForm />
 
         <div className="text-center">
           <Button asChild variant="link">
