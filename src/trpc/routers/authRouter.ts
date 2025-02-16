@@ -28,11 +28,18 @@ export const authRouter = createTRPCRouter({
         });
       }
       const hashedPassword = await bcryptjs.hash(password, 10);
-      const user = await db.insert(users).values({
-        email,
-        password: hashedPassword,
-        name,
-      });
+      const user = await db
+        .insert(users)
+        .values({
+          email,
+          password: hashedPassword,
+          name,
+        })
+        .returning({
+          id: users.id,
+          email: users.email,
+          name: users.name,
+        });
       return user;
     }),
   getUser: protectedProcedure.query(async ({ ctx }) => {
