@@ -4,6 +4,7 @@ import FormInput from "@/components/shared/forms/form-input";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/trpc/client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -17,6 +18,7 @@ const signUpForm = z.object({
 type SignUpForm = z.infer<typeof signUpForm>;
 
 const SignUpForm = () => {
+  const router = useRouter();
   const methods = useForm<SignUpForm>({
     resolver: zodResolver(signUpForm),
     defaultValues: {
@@ -27,12 +29,16 @@ const SignUpForm = () => {
   });
   const signUp = trpc.auth.signUp.useMutation({
     onSuccess: () => {
-      toast.success("Sign in successfully.");
+      toast.success("Sign up successfully.");
+      router.push("/sign-in");
     },
     onError: (error) => {
       toast.error(error.message, {
         richColors: true,
       });
+      if (error.data?.code === "BAD_REQUEST") {
+        methods.setError("email", { message: error.message });
+      }
     },
   });
 
@@ -48,6 +54,7 @@ const SignUpForm = () => {
         name="password"
         label="Password"
         placeholder="Password"
+        type="password"
       />
       <Button type="submit">Sign Up</Button>
     </Form>
