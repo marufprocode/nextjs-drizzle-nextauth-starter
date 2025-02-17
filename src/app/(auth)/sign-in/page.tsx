@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { auth, signIn } from "@/lib/auth";
-import executeAction from "@/lib/execute-action";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import SignInForm from "./_components/signin-form";
 
 export default async function SignIn() {
   const session = await auth();
@@ -45,35 +44,7 @@ export default async function SignIn() {
         </div>
 
         {/* Email/Password Sign In */}
-        <form
-          className="space-y-4"
-          action={async (formData: FormData) => {
-            "use server";
-            await executeAction({
-              actionFn: async () => {
-                await signIn("credentials", formData);
-              },
-            });
-          }}
-        >
-          <Input
-            name="email"
-            placeholder="Email"
-            type="email"
-            required
-            autoComplete="email"
-          />
-          <Input
-            name="password"
-            placeholder="Password"
-            type="password"
-            required
-            autoComplete="current-password"
-          />
-          <Button className="w-full" type="submit">
-            Sign In
-          </Button>
-        </form>
+        <SignInForm />
 
         <div className="text-center">
           <Button asChild variant="link">
